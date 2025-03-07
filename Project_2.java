@@ -4,7 +4,7 @@ Kyaw Zin Thant 6581178
 Chartwut Piriyapanyaporn 6481227
 Phurilap Kitlertpaisan 6680251*/
 
-package Project2_6581147;
+package Project2;
 
 import java.io.*;
 import java.util.*;
@@ -97,7 +97,7 @@ class AgencyThread extends Thread {
     }
 
     public void run() {
-        for (int day = 1; day <= Project2_6581147.days; day++) {
+        for (int day = 1; day <= Project_2.days; day++) {
             try {
                 dayCounter.waitForDay(day); 
 
@@ -147,7 +147,7 @@ class OperatorThread extends Thread {
     }
 
     public void run() {
-        for (int day = 1; day <= Project2_6581147.days; day++) {
+        for (int day = 1; day <= Project_2.days; day++) {
             try {
                 dayCounter.waitForDay(day);
                 
@@ -171,17 +171,18 @@ class OperatorThread extends Thread {
     }
 }
 
-public class Project2_6581147 {
+public class Project_2 {
     public static int days = 0;
     
     public static void main(String[] args) {
-        Scanner input= new Scanner(System.in);
-        String fileName="config_.txt";
-        Scanner scan=null;
+        Scanner input = new Scanner(System.in);
+        System.out.print("New file name: ");
+        String fileName = input.nextLine();
+        Scanner scan = null;
         
         while(scan==null){
             try {
-                scan = new Scanner(new File("src/main/java/Project2_6581147/"+fileName));
+                scan = new Scanner(new File("src/main/java/Project2/"+fileName));
 
                 int agencyCount = 0, maxArrival = 0, tourCount = 0, tourCapacity = 0, placeCount = 0;
 
@@ -263,7 +264,7 @@ public class Project2_6581147 {
                 fileName=input.next();
             } catch (IOException | InterruptedException e) {
                 System.err.println(e.getClass().getName());
-            }
+                }
         
         }
 
