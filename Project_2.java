@@ -176,94 +176,95 @@ public class Project2_6581147 {
     
     public static void main(String[] args) {
         Scanner input= new Scanner(System.in);
-        String fileName="config_1.txt";
+        String fileName="config_.txt";
         Scanner scan=null;
         
-        try {
-            scan = new Scanner(new File("src/main/java/Project2_6581147/"+fileName));
+        while(scan==null){
+            try {
+                scan = new Scanner(new File("src/main/java/Project2_6581147/"+fileName));
 
-            int agencyCount = 0, maxArrival = 0, tourCount = 0, tourCapacity = 0, placeCount = 0;
+                int agencyCount = 0, maxArrival = 0, tourCount = 0, tourCapacity = 0, placeCount = 0;
 
-            while (scan.hasNextLine()) {
-                String line = scan.nextLine();
-                String[] cols = line.split(",");
+                while (scan.hasNextLine()) {
+                    String line = scan.nextLine();
+                    String[] cols = line.split(",");
 
-                switch (cols[0].trim()) {
-                    case "days":
-                        days = Integer.parseInt(cols[1].trim());
-                        break;
-                    case "agency_num_arrival":
-                        agencyCount = Integer.parseInt(cols[1].trim());
-                        maxArrival = Integer.parseInt(cols[2].trim());
-                        break;
-                    case "tour_num_capacity":
-                        tourCount = Integer.parseInt(cols[1].trim());
-                        tourCapacity = Integer.parseInt(cols[2].trim());
-                        break;
-                    case "place_num":
-                        placeCount = Integer.parseInt(cols[1].trim());
-                        break;
+                    switch (cols[0].trim()) {
+                        case "days":
+                            days = Integer.parseInt(cols[1].trim());
+                            break;
+                        case "agency_num_arrival":
+                            agencyCount = Integer.parseInt(cols[1].trim());
+                            maxArrival = Integer.parseInt(cols[2].trim());
+                            break;
+                        case "tour_num_capacity":
+                            tourCount = Integer.parseInt(cols[1].trim());
+                            tourCapacity = Integer.parseInt(cols[2].trim());
+                            break;
+                        case "place_num":
+                            placeCount = Integer.parseInt(cols[1].trim());
+                            break;
+                    }
                 }
-            }
 
-            List<Tour> tours = new ArrayList<>();
-            for (int i = 0; i < tourCount; i++) {
-                tours.add(new Tour("Tour_" + i, tourCapacity));
-            }
+                List<Tour> tours = new ArrayList<>();
+                for (int i = 0; i < tourCount; i++) {
+                    tours.add(new Tour("Tour_" + i, tourCapacity));
+                }
 
-            List<Place> places = new ArrayList<>();
-            for (int i = 0; i < placeCount; i++) {
-                places.add(new Place("Place_" + i));
-            }
+                List<Place> places = new ArrayList<>();
+                for (int i = 0; i < placeCount; i++) {
+                    places.add(new Place("Place_" + i));
+                }
 
-            DayCounter dayCounter = new DayCounter();
-            CyclicBarrier arrivalBarrier = new CyclicBarrier(agencyCount);
-            CyclicBarrier sendBarrier = new CyclicBarrier(agencyCount + tourCount);
+                DayCounter dayCounter = new DayCounter();
+                CyclicBarrier arrivalBarrier = new CyclicBarrier(agencyCount);
+                CyclicBarrier sendBarrier = new CyclicBarrier(agencyCount + tourCount);
 
-            List<AgencyThread> agencies = new ArrayList<>();
-            for (int i = 0; i < agencyCount; i++) {
-                AgencyThread agency = new AgencyThread("AgencyThread_" + i, tours, maxArrival, dayCounter, arrivalBarrier, sendBarrier);
-                agencies.add(agency);
-                agency.start();
-            }
+                List<AgencyThread> agencies = new ArrayList<>();
+                for (int i = 0; i < agencyCount; i++) {
+                    AgencyThread agency = new AgencyThread("AgencyThread_" + i, tours, maxArrival, dayCounter, arrivalBarrier, sendBarrier);
+                    agencies.add(agency);
+                    agency.start();
+                }
 
-            List<OperatorThread> operators = new ArrayList<>();
-            for (Tour tour : tours) {
-                OperatorThread operator = new OperatorThread(tour, places, dayCounter, sendBarrier);
-                operators.add(operator);
-                operator.start();
-            }
+                List<OperatorThread> operators = new ArrayList<>();
+                for (Tour tour : tours) {
+                    OperatorThread operator = new OperatorThread(tour, places, dayCounter, sendBarrier);
+                    operators.add(operator);
+                    operator.start();
+                }
 
-            for (int day = 1; day <= days; day++) {
-                System.out.println(Thread.currentThread().getName() + " >> Day " + day);
-                dayCounter.incrementDay(); 
-                Thread.sleep(100); 
-            }
+                for (int day = 1; day <= days; day++) {
+                    System.out.println(Thread.currentThread().getName() + " >> Day " + day);
+                    dayCounter.incrementDay(); 
+                    Thread.sleep(100); 
+                }
 
-            for (AgencyThread agency : agencies) {
-                agency.join();
-            }
-            for (OperatorThread operator : operators) {
-                operator.join();
-            }
+                for (AgencyThread agency : agencies) {
+                    agency.join();
+                }
+                for (OperatorThread operator : operators) {
+                    operator.join();
+                }
 
-            System.out.println(Thread.currentThread().getName() + " >> Summary");
-            tours.sort(Comparator.comparing(Tour::getTotalCustomers).reversed().thenComparing(Tour::getName));
-            for (Tour tour : tours) {
-                System.out.println(Thread.currentThread().getName() + " >> " + tour.getName() + "   total customers= " + tour.getTotalCustomers());
-            }
-
-        } catch(FileNotFoundException e){
-            System.err.println(e);
-            System.out.println("New file name:");
-            fileName=input.next();
-        } catch (IOException | InterruptedException e) {
-            System.err.println(e.getClass().getName());
-        } finally {
-            if (scan != null) {
+                System.out.println(Thread.currentThread().getName() + " >> Summary");
+                tours.sort(Comparator.comparing(Tour::getTotalCustomers).reversed().thenComparing(Tour::getName));
+                for (Tour tour : tours) {
+                    System.out.println(Thread.currentThread().getName() + " >> " + tour.getName() + "   total customers= " + tour.getTotalCustomers());
+                }
+            
                 scan.close();
+                input.close();
+
+            } catch(FileNotFoundException e){
+                System.err.println(e);
+                System.out.println("New file name:");
+                fileName=input.next();
+            } catch (IOException | InterruptedException e) {
+                System.err.println(e.getClass().getName());
             }
-            input.close();
+        
         }
 
     }
